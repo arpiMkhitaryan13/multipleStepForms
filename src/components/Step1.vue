@@ -39,7 +39,7 @@
         <input v-on:change="check" class="shippingCheckbox" type="checkbox" name="shipping" value=""> Use filled data
         for shipping<br>
 
-        <select :disabled="checked" v-model="checked?selected:shippingCountry"
+        <select :disabled="checked" v-model="checked?country:shippingCountry"
                 v-bind:class="{'invalid':!shippingCountry && attemptSubmit && !checked, 'unused':checked}">
             <option value="" disabled hidden>Choose your Country</option>
             <option v-for="country in countries" v-bind:value="country.Country">
@@ -78,22 +78,22 @@
 
 <script>
     export default {
-        props: ['countries'],
+        props: ['countries', 'form1Data'],
         data() {
+            const { form1Data } = this;
             return {
                 attemptSubmit: false,
-                checked: false,
-                name: null,
-                lastName: null,
-                selected: '',
-                postalCode: '',
-                address: '',
-                city: null,
-                country: '',
-                shippingCity: null,
-                shippingAddress: null,
-                shippingPostalCode: null,
-                shippingCountry: '',
+                checked: form1Data && form1Data.checked || false,
+                name: form1Data && form1Data.name || null,
+                lastName: form1Data && form1Data.lastName || null,
+                postalCode: form1Data && form1Data.postalCode || '',
+                address: form1Data && form1Data.address || '',
+                city: form1Data && form1Data.city || null,
+                country: form1Data && form1Data.country ||  '',
+                shippingCity: form1Data && form1Data.shipping.shippingCity || null,
+                shippingAddress: form1Data &&  form1Data.shipping.shippingAddress || null,
+                shippingPostalCode: form1Data && form1Data.shipping.shippingPostalCode|| null,
+                shippingCountry: form1Data &&  form1Data.shipping.shippingCountry || '',
             }
         },
 
@@ -107,12 +107,14 @@
 
                 if (this.isFormValid) {
                     const propsToPass = {
+                        step:2,
                         name,
                         lastName,
                         country,
                         city,
                         address,
                         postalCode,
+                        checked,
                         shipping: {
                             shippingCountry: checked ? country : shippingCountry,
                             shippingCity: checked ? city : shippingCity,

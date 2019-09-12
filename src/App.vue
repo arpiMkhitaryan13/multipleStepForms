@@ -35,7 +35,7 @@ export default {
     padding: 8px 18px;
     border-radius: 8px;
     outline: none;
-    margin-bottom: 1em;
+    margin: 1em .5em;
   }
     input, select {
       display: block;
