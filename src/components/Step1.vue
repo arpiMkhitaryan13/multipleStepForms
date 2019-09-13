@@ -18,7 +18,7 @@
         </select>
         <p v-if="!country && attemptSubmit" class="error-message">*The country field is required</p>
 
-        <input maxlength="8" minlength="3" v-on:input="onlyAlpha('cityNameInput')"
+        <input maxlength="8" minlength="3" v-on:input="onlyLetter('cityNameInput')"
                v-bind:class="{'invalid':(!city && attemptSubmit)|| city && city.length <= 3}" id="cityNameInput"
                v-on:blur="blurField('cityNameInput')" v-on:focus="focusField('cityNameInput')" placeholder="City"
                v-model="city"/>
@@ -80,7 +80,7 @@
     export default {
         props: ['countries', 'form1Data'],
         data() {
-            const { form1Data } = this;
+            const {form1Data} = this;
             return {
                 attemptSubmit: false,
                 checked: form1Data && form1Data.checked || false,
@@ -89,11 +89,11 @@
                 postalCode: form1Data && form1Data.postalCode || '',
                 address: form1Data && form1Data.address || '',
                 city: form1Data && form1Data.city || null,
-                country: form1Data && form1Data.country ||  '',
+                country: form1Data && form1Data.country || '',
                 shippingCity: form1Data && form1Data.shipping.shippingCity || null,
-                shippingAddress: form1Data &&  form1Data.shipping.shippingAddress || null,
-                shippingPostalCode: form1Data && form1Data.shipping.shippingPostalCode|| null,
-                shippingCountry: form1Data &&  form1Data.shipping.shippingCountry || '',
+                shippingAddress: form1Data && form1Data.shipping.shippingAddress || null,
+                shippingPostalCode: form1Data && form1Data.shipping.shippingPostalCode || null,
+                shippingCountry: form1Data && form1Data.shipping.shippingCountry || '',
             }
         },
 
@@ -107,7 +107,7 @@
 
                 if (this.isFormValid) {
                     const propsToPass = {
-                        step:2,
+                        step: 2,
                         name,
                         lastName,
                         country,
@@ -128,8 +128,8 @@
                 }
             },
             blurField(id) {
-                if (!document.getElementById(`${id}`).value && !this.checked) {
-                    document.getElementById(`${id}`).style.borderColor = "red";
+                if (!document.getElementById(id).value && !this.checked) {
+                    document.getElementById(id).style.borderColor = "red";
                 } else {
                     this.focusField(id)
                 }
@@ -137,13 +137,13 @@
             focusField(id) {
                 document.getElementById(`${id}`).style.borderColor = "#216288";
             },
-            onlyAlpha(id) {
+            onlyLetter(id) {
                 this.city = this.city.replace(/[0-9]/g, '');
-                this.blurField(id)
+                this.blurField(id);
             },
             regex(id) {
                 if (Number(this.address[0])) {
-                    this.address = this.address[0] && this.address[0] + this.address.substr(1).replace(/[0-9]/g, '');
+                    this.address = this.address[0] + this.address.substr(1).replace(/[0-9]/g, '');
                 } else {
                     this.address = this.address.replace(/./g, '')
                 }
@@ -152,7 +152,7 @@
             postalCodeValidation(postalCode) {
                 const selectedCountry = this.countries.find(o => Object.keys(o).some(k => o[k].toLowerCase().includes(this.country.toLowerCase())));
                 const regex = new RegExp(selectedCountry.Regex);
-                return regex.test(postalCode)
+                return regex.test(postalCode);
             }
         },
         computed: {
