@@ -11,11 +11,12 @@
                         <g id="CardBackground">
                             <g id="Page-1_1_">
                                 <g id="amex_1_">
-                                    <path id="Rectangle-1_1_" class="lightcolor grey" d="M40,0h670c22.1,0,40,17.9,40,40v391c0,22.1-17.9,40-40,40H40c-22.1,0-40-17.9-40-40V40
+                                    <path v-bind:style="{'fill': cardColor1 && cardNumber? cardColor1: 'grey'}" id="Rectangle-1_1_"
+                                          class="lightcolor grey" d="M40,0h670c22.1,0,40,17.9,40,40v391c0,22.1-17.9,40-40,40H40c-22.1,0-40-17.9-40-40V40
                             C0,17.9,17.9,0,40,0z"/>
                                 </g>
                             </g>
-                            <path class="darkcolor greydark"
+                            <path v-bind:style="{'fill': cardColor2 && cardNumber? cardColor2: 'a0a0a2'}" class="darkcolor greydark"
                                   d="M750,431V193.2c-217.6-57.5-556.4-13.5-750,24.9V431c0,22.1,17.9,40,40,40h670C732.1,471,750,453.1,750,431z"/>
                         </g>
                         <text transform="matrix(1 0 0 1 60.106 295.0121)" id="svgnumber" class="st2 st3 st4">{{cardNumber}}</text>
@@ -23,12 +24,11 @@
                         <text transform="matrix(1 0 0 1 54.1074 389.8793)" class="st7 st5 st8">cardholder name</text>
                         <text transform="matrix(1 0 0 1 479.7754 388.8793)" class="st7 st5 st8">expiration</text>
                         <text transform="matrix(1 0 0 1 65.1054 241.5)" class="st7 st5 st8">card number</text>
-                        <g>
-                            <text transform="matrix(1 0 0 1 574.4219 433.8095)" id="svgexpire"
-                                  class="st2 st5 st9">{{expirationDate || '11/03'}}</text>
-                            <text transform="matrix(1 0 0 1 479.3848 417.0097)" class="st2 st10 st11">VALID</text>
-                            <text transform="matrix(1 0 0 1 479.3848 435.6762)" class="st2 st10 st11">THRU</text>
-                            <polygon class="st2" points="554.5,421 540.4,414.2 540.4,427.9 		"/>
+                        <text transform="matrix(1 0 0 1 574.4219 433.8095)" id="svgexpire"
+                              class="st2 st5 st9">{{expirationDate || '11/03'}}</text>
+                        <text transform="matrix(1 0 0 1 479.3848 417.0097)" class="st2 st10 st11">VALID</text>
+                        <text transform="matrix(1 0 0 1 479.3848 435.6762)" class="st2 st10 st11">THRU</text>
+                        <polygon class="st2" points="554.5,421 540.4,414.2 540.4,427.9 		"/>
                         </g>
                         <g id="cchip">
                             <g>
@@ -62,7 +62,6 @@
                                     <rect x="142" y="117.9" class="st12" width="26.2" height="1.5"/>
                                 </g>
                             </g>
-                        </g>
                     </g>
                         <g id="Back">
                     </g>
@@ -78,7 +77,7 @@
                         <g id="Back">
                         <g id="Page-1_2_">
                             <g id="amex_2_">
-                                <path id="Rectangle-1_2_" class="darkcolor greydark" d="M40,0h670c22.1,0,40,17.9,40,40v391c0,22.1-17.9,40-40,40H40c-22.1,0-40-17.9-40-40V40
+                                <path v-bind:style="{'fill': cardColor1 && cardNumber? cardColor1: 'grey'}" id="Rectangle-1_2_" class="darkcolor greydark" d="M40,0h670c22.1,0,40,17.9,40,40v391c0,22.1-17.9,40-40,40H40c-22.1,0-40-17.9-40-40V40
                         C0,17.9,17.9,0,40,0z"/>
                             </g>
                         </g>
@@ -101,18 +100,23 @@
                             <text transform="matrix(1 0 0 1 59.5073 228.6099)" id="svgnameback" class="st12 st13">{{cardHolderName}}</text>
                     </g>
                 </svg>
+
                 </div>
             </div>
         </div>
         <form @submit.prevent="onSubmit()">
-
-            <input v-mask="'#### #### #### ####'" placeholder="Card number..." v-model="cardNumber" type="text"
-                   v-on:input="onFlipCard('front')">
-            <input placeholder="Cardholder name..." v-model="cardHolderName" v-on:input="onFlipCard('front')" @paste.prevent maxlength="21" v-on:keyup="onKeyUp">
-            <input placeholder="Security code..." v-model="securityCode" v-on:input="onFlipCard('back')" max="4" >
+            <input v-mask="mask" placeholder="Card number..." v-model="cardNumber" type="text"
+                   v-on:input="checkValidation" >
+            <img class="ccIcon" v-if="activeCreditCardName && cardNumber && !flipped" :src="activeCreditCardName"
+                 alt="">
+            <input placeholder="Cardholder name..." v-model="cardHolderName" v-on:input="onFlipCard('front')"
+                   @paste.prevent maxlength="21" v-on:keyup="onKeyUp">
+            <input placeholder="Security code..." v-model="securityCode" v-on:input="onFlipCard('back')" maxlength="4">
             <input v-mask="'##/##'" type="text" placeholder="Expiration date..." v-model="expirationDate"
                    v-on:input="onFlipCard('front')">
             <button>Submit</button>
+
+
         </form>
     </div>
 </template>
@@ -135,29 +139,77 @@
                 cardName: null,
                 securityCode: null,
                 expirationDate: null,
-                visaRegEx: /^(?:4[0-9]{12}(?:[0-9]{3})?)$/,
-                mastercardRegEx: /^(?:5[1-5][0-9]{14})$/,
-                amexpRegEx: /^(?:3[47][0-9]{13})$/,
+                activeCreditCardName: null,
+                mask: '#### #### #### ####',
+                cardColor1: null,
+                cardColor2: null,
+                length: null,
+                creditcards: {
+                    list: [
+                        {
+                            brand: 'AmEx',
+                            image: '/img/AmEx.25d50e4c.svg',
+                            verification: '^3[47][0-9]',
+                            mask: '#### ###### #####',
+                            color1: '#ffeb3b',
+                            color2: '#f9a825',
+                            length: 15,
+                        },
+                        {
+                            brand: 'MasterCard',
+                            image: "/img/MasterCard.29cbd0e2.svg",
+                            verification: '^5[1-5][0-9]',
+                            mask: '#### #### #### ####',
+                            color1: '#03A9F4',
+                            color2: '#0288D1',
+                            length: 16,
+                        },
+                        {
+                            brand: 'Visa',
+                            image: '/img/Visa.3e42f8b5.svg',
+                            verification: '^4[0-9]',
+                            mask: '#### #### #### ####',
+                            color1: '#66bb6a',
+                            color2: '#388e3c',
+                            length: 13,
+
+                        },
+                        {
+                            brand: 'Hyper Card',
+                            image: '/img/HiperCard.9847aedc.svg',
+                            verification: '^3(?:0[0-5]|[68][0-9])[0-9]',
+                            mask: '#### #### #### ####',
+                            color1: '#ef5350',
+                            color2: '#d32f2f',
+                            length: 14,
+                        },
+
+                    ],
+                    active: null
+                },
             }
         },
+
         methods: {
             onSubmit() {
                 console.log('submitted');
-
-              //   const string = 'abracadabra';
-              //
-              // String.prototype.customForEach =  function customForEach(callback) {
-              //       for (let i = 0; i < this.length; i++) {
-              //           callback(i, this[i]);
-              //       }
-              //   }
-              //   string.customForEach(function (i, item) {
-              //       console.log( i, item,'item');
-              //   })
-
             },
-            onKeyUp(){
-                if (!event.getModifierState("CapsLock")){
+            checkValidation() {
+                // const { creditcards, cardNumber, activeCreditCardName, mask, cardColor1, cardColor2  } = this;
+                for (let i = 0; i < this.creditcards.list.length; i++) {
+                    if (this.cardNumber.match(new RegExp(this.creditcards.list[i].verification))) {
+                        this.creditcards.active = i + 1;
+                        this.activeCreditCardName = this.creditcards.list[i].image;
+                        this.cardName = this.creditcards.list[i].brand;
+                        this.mask = this.creditcards.list[i].mask;
+                        this.cardColor1 = this.creditcards.list[i].color1;
+                        this.cardColor2 = this.creditcards.list[i].color2;
+                        this.length = this.creditcards.list[i].length;
+                    }
+                }
+            },
+            onKeyUp() {
+                if (!event.getModifierState("CapsLock")) {
                     this.cardHolderName = this.cardHolderName.replace(/./g, '')
                 }
             },
@@ -241,7 +293,7 @@
     }
 
     .container {
-        width: 100%;
+        /*width: 100%;*/
         max-width: 400px;
         max-height: 251px;
         height: 54vw;
@@ -267,96 +319,8 @@
         border-radius: 22px;
     }
 
-    #generatecard {
-        cursor: pointer;
-        float: right;
-        font-size: 12px;
-        color: #fff;
-        padding: 2px 4px;
-        background-color: #909090;
-        border-radius: 4px;
-        cursor: pointer;
-        float: right;
-    }
 
-    /* CHANGEABLE CARD ELEMENTS */
-    .creditcard .lightcolor,
-    .creditcard .darkcolor {
-        -webkit-transition: fill .5s;
-        transition: fill .5s;
-    }
 
-    .creditcard .lightblue {
-        fill: #03A9F4;
-    }
-
-    .creditcard .lightbluedark {
-        fill: #0288D1;
-    }
-
-    .creditcard .red {
-        fill: #ef5350;
-    }
-
-    .creditcard .reddark {
-        fill: #d32f2f;
-    }
-
-    .creditcard .purple {
-        fill: #ab47bc;
-    }
-
-    .creditcard .purpledark {
-        fill: #7b1fa2;
-    }
-
-    .creditcard .cyan {
-        fill: #26c6da;
-    }
-
-    .creditcard .cyandark {
-        fill: #0097a7;
-    }
-
-    .creditcard .green {
-        fill: #66bb6a;
-    }
-
-    .creditcard .greendark {
-        fill: #388e3c;
-    }
-
-    .creditcard .lime {
-        fill: #d4e157;
-    }
-
-    .creditcard .limedark {
-        fill: #afb42b;
-    }
-
-    .creditcard .yellow {
-        fill: #ffeb3b;
-    }
-
-    .creditcard .yellowdark {
-        fill: #f9a825;
-    }
-
-    .creditcard .orange {
-        fill: #ff9800;
-    }
-
-    .creditcard .orangedark {
-        fill: #ef6c00;
-    }
-
-    .creditcard .grey {
-        fill: #bdbdbd;
-    }
-
-    .creditcard .greydark {
-        fill: #616161;
-    }
 
     /* FRONT OF CARD */
     #svgname {
@@ -507,5 +471,16 @@
 
     .flipped {
         display: contents;
+    }
+
+    .cardNumberInput {
+        display: flex;
+    }
+
+    .ccIcon {
+        position: absolute;
+        top: 20%;
+        right: 16%;
+        height: 15%;
     }
 </style>

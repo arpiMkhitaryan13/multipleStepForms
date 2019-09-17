@@ -92,5 +92,6 @@
         box-shadow: 1px 1px 25px rgba(0, 0, 0, 0.35);
         border-radius: 10px;
         border: 6px solid #305A72;
+        position: relative;
     }
 </style>
