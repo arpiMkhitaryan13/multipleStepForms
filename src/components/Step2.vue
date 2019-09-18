@@ -27,15 +27,15 @@
             submit(prev) {
                 this.attemptSubmit = true;
                 const {email, password, step} = this;
+                const propsToPass = {
+                    email,
+                    password,
+                    step,
+                };
                 if (prev && this.email && this.password) {
-                    const propsToPass = {
-                        email,
-                        password,
-                        step,
-                    };
                     this.$emit('clicked', propsToPass);
                 } else {
-                    this.$emit('clicked');
+                    this.$emit('clicked', propsToPass);
                     console.log('error in step 2');
                 }
             },

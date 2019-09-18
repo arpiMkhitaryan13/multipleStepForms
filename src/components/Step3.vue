@@ -11,12 +11,14 @@
                         <g id="CardBackground">
                             <g id="Page-1_1_">
                                 <g id="amex_1_">
-                                    <path v-bind:style="{'fill': cardColor1 && cardNumber? cardColor1: 'grey'}" id="Rectangle-1_1_"
+                                    <path v-bind:style="{'fill': cardColor1 && cardNumber? cardColor1: 'grey'}"
+                                          id="Rectangle-1_1_"
                                           class="lightcolor grey" d="M40,0h670c22.1,0,40,17.9,40,40v391c0,22.1-17.9,40-40,40H40c-22.1,0-40-17.9-40-40V40
                             C0,17.9,17.9,0,40,0z"/>
                                 </g>
                             </g>
-                            <path v-bind:style="{'fill': cardColor2 && cardNumber? cardColor2: 'a0a0a2'}" class="darkcolor greydark"
+                            <path v-bind:style="{'fill': cardColor2 && cardNumber? cardColor2: 'a0a0a2'}"
+                                  class="darkcolor greydark"
                                   d="M750,431V193.2c-217.6-57.5-556.4-13.5-750,24.9V431c0,22.1,17.9,40,40,40h670C732.1,471,750,453.1,750,431z"/>
                         </g>
                         <text transform="matrix(1 0 0 1 60.106 295.0121)" id="svgnumber" class="st2 st3 st4">{{cardNumber}}</text>
@@ -77,7 +79,8 @@
                         <g id="Back">
                         <g id="Page-1_2_">
                             <g id="amex_2_">
-                                <path v-bind:style="{'fill': cardColor1 && cardNumber? cardColor1: 'grey'}" id="Rectangle-1_2_" class="darkcolor greydark" d="M40,0h670c22.1,0,40,17.9,40,40v391c0,22.1-17.9,40-40,40H40c-22.1,0-40-17.9-40-40V40
+                                <path v-bind:style="{'fill': cardColor1 && cardNumber? cardColor1: 'grey'}"
+                                      id="Rectangle-1_2_" class="darkcolor greydark" d="M40,0h670c22.1,0,40,17.9,40,40v391c0,22.1-17.9,40-40,40H40c-22.1,0-40-17.9-40-40V40
                         C0,17.9,17.9,0,40,0z"/>
                             </g>
                         </g>
@@ -97,7 +100,8 @@
                         </g>
                             <rect x="58.1" y="378.6" class="st11" width="375.5" height="13.5"/>
                             <rect x="58.1" y="405.6" class="st11" width="421.7" height="13.5"/>
-                            <text transform="matrix(1 0 0 1 59.5073 228.6099)" id="svgnameback" class="st12 st13">{{cardHolderName}}</text>
+                            <text transform="matrix(1 0 0 1 59.5073 228.6099)" id="svgnameback"
+                                  class="st12 st13"></text>
                     </g>
                 </svg>
 
@@ -105,50 +109,65 @@
             </div>
         </div>
         <form @submit.prevent="onSubmit()">
-            <input v-mask="mask" placeholder="Card number..." v-model="cardNumber" type="text"
-                   v-on:input="checkValidation" >
+            <input id="ccNumberInput" @blur="onBlurMixin('ccNumberInput')" @focus="onFocusMixin('ccNumberInput')"
+                   v-mask="mask" placeholder="Card number..." v-model="cardNumber" type="text"
+                   v-on:input="checkValidation('ccNumberInput')"
+                   :maxlength="ccValidLength || 20"
+                   v-bind:class="{'invalid':(!cardNumber && attemptSubmit) || (cardNumber && !ccValidLength) }">
+            <p v-if="(!cardNumber && attemptSubmit) || (cardNumber && !ccValidLength)">*Enter valid card number</p>
             <img class="ccIcon" v-if="activeCreditCardName && cardNumber && !flipped" :src="activeCreditCardName"
                  alt="">
-            <input placeholder="Cardholder name..." v-model="cardHolderName" v-on:input="onFlipCard('front')"
-                   @paste.prevent maxlength="21" v-on:keyup="onKeyUp">
-            <input placeholder="Security code..." v-model="securityCode" v-on:input="onFlipCard('back')" maxlength="4">
-            <input v-mask="'##/##'" type="text" placeholder="Expiration date..." v-model="expirationDate"
-                   v-on:input="onFlipCard('front')">
+            <input id="ccNameInput" @blur="onBlurMixin('ccNameInput')" @focus="onFocusMixin('ccNameInput')"
+                   placeholder="Cardholder name..." v-model="cardHolderName" @input="disableNumberInput('ccNameInput')"
+                   @paste.prevent maxlength="21"
+                   :class="{'invalid' : !cardHolderName && attemptSubmit}">
+            <input id="ccSecurityCode" @blur="onBlurMixin('ccSecurityCode')" @focus="onFocusMixin('ccSecurityCode')"
+                   placeholder="Security code..." v-model="securityCode" @click="onFlipCard('back')"
+                   @input="disableLetterInput('ccSecurityCode')" maxlength="4"
+                   :class="{'invalid' : !securityCode && attemptSubmit}">
+            <input id="ccDate" @blur="onBlurMixin('ccDate')" @focus="onFocusMixin('ccDate')" v-mask="'##/##'"
+                   type="text" placeholder="Expiration date..." v-model="expirationDate"
+                   @input="dateValidation('ccDate')"
+                   :class="{'invalid' : !expirationDate && attemptSubmit}">
+            <p v-if="(!expirationDate && attemptSubmit) || expirationDate && expirationDate.length !== 5">*Enter valid date until 2024</p>
+            <button type="button" v-on:click="prev()">Previous</button>
             <button>Submit</button>
-
-
         </form>
     </div>
 </template>
 
 <script>
     import Vue from 'vue';
-    import VueMask from 'v-mask'
+    import VueMask from 'v-mask';
+    import helpers from "../mixins/helpers";
 
     Vue.use(VueMask);
 
 
     export default {
         name: "Step3",
-        props: ['_cardHolderName'],
+        props: ['_cardHolderName', 'form3Data'],
+        mixins: [helpers],
         data() {
+            const { form3Data } = this;
             return {
+                step:3,
+                attemptSubmit: false,
                 flipped: false,
-                cardNumber: null,
-                cardHolderName: this._cardHolderName || '',
-                cardName: null,
-                securityCode: null,
-                expirationDate: null,
+                cardNumber: form3Data && form3Data.cardNumber || null,
+                cardHolderName: form3Data && form3Data.cardHolderName || '',
+                securityCode: form3Data && form3Data.securityCode || null,
+                expirationDate:  form3Data && form3Data.expirationDate || null,
                 activeCreditCardName: null,
                 mask: '#### #### #### ####',
                 cardColor1: null,
                 cardColor2: null,
-                length: null,
+                ccValidLength: null,
                 creditcards: {
                     list: [
                         {
                             brand: 'AmEx',
-                            image: '/img/AmEx.25d50e4c.svg',
+                            image: '/img/AmEx.c79ad081.svg',
                             verification: '^3[47][0-9]',
                             mask: '#### ###### #####',
                             color1: '#ffeb3b',
@@ -157,7 +176,7 @@
                         },
                         {
                             brand: 'MasterCard',
-                            image: "/img/MasterCard.29cbd0e2.svg",
+                            image: "/img/MasterCard.cedb0a3c.svg",
                             verification: '^5[1-5][0-9]',
                             mask: '#### #### #### ####',
                             color1: '#03A9F4',
@@ -166,17 +185,17 @@
                         },
                         {
                             brand: 'Visa',
-                            image: '/img/Visa.3e42f8b5.svg',
+                            image: '/img/Visa.6db9a801.svg',
                             verification: '^4[0-9]',
                             mask: '#### #### #### ####',
                             color1: '#66bb6a',
                             color2: '#388e3c',
-                            length: 13,
+                            length: 16,
 
                         },
                         {
                             brand: 'Hyper Card',
-                            image: '/img/HiperCard.9847aedc.svg',
+                            image: '/img/HiperCard.b987fe1f.svg',
                             verification: '^3(?:0[0-5]|[68][0-9])[0-9]',
                             mask: '#### #### #### ####',
                             color1: '#ef5350',
@@ -191,30 +210,42 @@
         },
 
         methods: {
-            onSubmit() {
-                console.log('submitted');
+            onSubmit(prev) {
+                this.attemptSubmit = true;
+                const {ccValidLength, expirationDate, cardHolderName, securityCode, cardNumber } = this;
+                if ( ccValidLength && expirationDate.length === 5 &&cardHolderName && securityCode ) {
+                    const propsToPass = {
+                        cardNumber,
+                        cardHolderName,
+                        securityCode,
+                        expirationDate,
+                        step: prev? prev: 4,
+                    };
+                    this.$emit('onSubmitStep3', propsToPass);
+                }else {
+                    console.log('error in step 3');
+                }
             },
-            checkValidation() {
-                // const { creditcards, cardNumber, activeCreditCardName, mask, cardColor1, cardColor2  } = this;
+            checkValidation(id) {
                 for (let i = 0; i < this.creditcards.list.length; i++) {
                     if (this.cardNumber.match(new RegExp(this.creditcards.list[i].verification))) {
                         this.creditcards.active = i + 1;
                         this.activeCreditCardName = this.creditcards.list[i].image;
-                        this.cardName = this.creditcards.list[i].brand;
                         this.mask = this.creditcards.list[i].mask;
                         this.cardColor1 = this.creditcards.list[i].color1;
                         this.cardColor2 = this.creditcards.list[i].color2;
-                        this.length = this.creditcards.list[i].length;
+                        let cardNumberWithoutSpaces = this.cardNumber.replace(/\s/g, '').length;
+                        if (cardNumberWithoutSpaces === this.creditcards.list[i].length) {
+                            this.ccValidLength = cardNumberWithoutSpaces;
+                        } else {
+                            this.ccValidLength = null;
+                        }
                     }
                 }
-            },
-            onKeyUp() {
-                if (!event.getModifierState("CapsLock")) {
-                    this.cardHolderName = this.cardHolderName.replace(/./g, '')
-                }
+                this.onBlurMixin(id);
+                this.onFlipCard('front');
             },
             onFlipCard(type) {
-
                 if (type === 'back') {
                     this.flipped = true;
                 } else if (type === 'front') {
@@ -223,104 +254,40 @@
                     this.flipped = !this.flipped;
                 }
             },
+            disableNumberInput(id) {
+                this.cardHolderName = this.cardHolderName.replace(/[^A-Za-z-]/g, '');
+                this.onBlurMixin(id);
+                this.onFlipCard('front');
+            },
+            disableLetterInput(id) {
+                this.securityCode = this.securityCode.replace(/\D+/g, '');
+                this.onBlurMixin(id);
+                this.onFlipCard('back');
+            },
+            dateValidation(id) {
+                let month = Number(this.expirationDate.split('/')[0]);
+                let year = Number(this.expirationDate.split('/')[1]);
+                if ((month && month > 12) || (year && year > 24) || (!month && this.expirationDate[1] === '0') || (!year && this.expirationDate[4] === '0')) {
+                    this.expirationDate = null;
+                }
+                this.onFlipCard('front');
+                this.onBlurMixin(id);
+            },
+            prev() {
+                this.step = 2;
+                this.onSubmit(this.step);
+            },
         },
     }
 </script>
 
 <style scoped>
-    body {
-        margin: 0;
-        padding: 0;
-        background-color: #f9f9f9;
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-        -ms-flex-line-pack: center;
-        align-content: center;
-        -webkit-box-align: center;
-        -ms-flex-align: center;
-        align-items: center;
-        -webkit-box-pack: center;
-        -ms-flex-pack: center;
-        justify-content: center;
-        min-height: 100vh;
-        -ms-flex-wrap: wrap;
-        flex-wrap: wrap;
-        font-family: 'Raleway';
-    }
-
-    .payment-title {
-        width: 100%;
-        text-align: center;
-    }
-
-    .form-container .field-container:first-of-type {
-        grid-area: name;
-    }
-
-    .form-container .field-container:nth-of-type(2) {
-        grid-area: number;
-    }
-
-    .form-container .field-container:nth-of-type(3) {
-        grid-area: expiration;
-    }
-
-    .form-container .field-container:nth-of-type(4) {
-        grid-area: security;
-    }
-
-
-    label {
-        padding-bottom: 5px;
-        font-size: 13px;
-    }
-
-    .ccicon {
-        height: 38px;
-        position: absolute;
-        right: 6px;
-        top: calc(50% - 17px);
-        width: 60px;
-    }
-
-    /* CREDIT CARD IMAGE STYLING */
-    .preload * {
-        -webkit-transition: none !important;
-        -moz-transition: none !important;
-        -ms-transition: none !important;
-        -o-transition: none !important;
-    }
-
     .container {
-        /*width: 100%;*/
         max-width: 400px;
         max-height: 251px;
         height: 54vw;
         padding: 50px;
     }
-
-    #ccsingle {
-        position: absolute;
-        right: 15px;
-        top: 20px;
-    }
-
-    #ccsingle svg {
-        width: 100px;
-        max-height: 60px;
-    }
-
-    .creditcard svg#cardfront,
-    .creditcard svg#cardback {
-        width: 100%;
-        -webkit-box-shadow: 1px 5px 6px 0px black;
-        box-shadow: 1px 5px 6px 0px black;
-        border-radius: 22px;
-    }
-
-
-
 
     /* FRONT OF CARD */
     #svgname {
@@ -415,10 +382,7 @@
         fill: #FFFFFF;
     }
 
-    #cardback .st10 {
-        font-size: 24px;
-    }
-
+    b
     #cardback .st11 {
         fill: #EAEAEA;
     }
@@ -431,41 +395,16 @@
         font-size: 37.769px;
     }
 
-    /* FLIP ANIMATION */
-    .container {
-        perspective: 1000px;
-    }
-
-    .creditcard {
-        width: 100%;
-        max-width: 400px;
-        -webkit-transform-style: preserve-3d;
-        transform-style: preserve-3d;
-        transition: -webkit-transform 0.6s;
-        -webkit-transition: -webkit-transform 0.6s;
-        transition: transform 0.6s;
-        transition: transform 0.6s, -webkit-transform 0.6s;
-        cursor: pointer;
-    }
-
     .creditcard .front,
     .creditcard .back {
         position: absolute;
         width: 100%;
         max-width: 400px;
-        -webkit-backface-visibility: hidden;
         backface-visibility: hidden;
-        -webkit-font-smoothing: antialiased;
         color: #47525d;
     }
 
     .creditcard .back {
-        -webkit-transform: rotateY(180deg);
-        transform: rotateY(180deg);
-    }
-
-    .creditcard.flipped {
-        -webkit-transform: rotateY(180deg);
         transform: rotateY(180deg);
     }
 
@@ -482,5 +421,13 @@
         top: 20%;
         right: 16%;
         height: 15%;
+    }
+
+    .invalid {
+        border-color: red !important;
+    }
+
+    p {
+        color: red;
     }
 </style>
