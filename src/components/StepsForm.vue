@@ -40,7 +40,7 @@
         },
         data() {
             return {
-                currentStep: 1,
+                currentStep: 3,
                 totalSteps: 4,
                 countries: null,
                 form1Data: null,

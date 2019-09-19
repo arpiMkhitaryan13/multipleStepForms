@@ -115,8 +115,13 @@
                    :maxlength="ccValidLength || 20"
                    v-bind:class="{'invalid':(!cardNumber && attemptSubmit) || (cardNumber && !ccValidLength) }">
             <p v-if="(!cardNumber && attemptSubmit) || (cardNumber && !ccValidLength)">*Enter valid card number</p>
-            <img class="ccIcon" v-if="activeCreditCardName && cardNumber && !flipped" :src="activeCreditCardName"
-                 alt="">
+            <!--            <img class="ccIcon" v-if="activeCreditCardName && cardNumber && !flipped" :src="dambul"-->
+            <!--                 alt="">{{activeCreditCardName}}-->
+            <!--   **********************************************************************         -->
+            <img
+                    class="ccIcon"
+                    v-if="dambul && cardNumber && !flipped"
+                    v-bind:src="require(`@/assets/ccIcons/${dambul}.svg`)">
             <input id="ccNameInput" @blur="onBlurMixin('ccNameInput')" @focus="onFocusMixin('ccNameInput')"
                    placeholder="Cardholder name..." v-model="cardHolderName" @input="disableNumberInput('ccNameInput')"
                    @paste.prevent maxlength="21"
@@ -129,7 +134,8 @@
                    type="text" placeholder="Expiration date..." v-model="expirationDate"
                    @input="dateValidation('ccDate')"
                    :class="{'invalid' : !expirationDate && attemptSubmit}">
-            <p v-if="(!expirationDate && attemptSubmit) || expirationDate && expirationDate.length !== 5">*Enter valid date until 2024</p>
+            <p v-if="(!expirationDate && attemptSubmit) || expirationDate && expirationDate.length !== 5">*Enter valid
+                date until 2024</p>
             <button type="button" v-on:click="prev()">Previous</button>
             <button>Submit</button>
         </form>
@@ -149,16 +155,17 @@
         props: ['_cardHolderName', 'form3Data'],
         mixins: [helpers],
         data() {
-            const { form3Data } = this;
+            const {form3Data} = this;
             return {
-                step:3,
+                step: 3,
                 attemptSubmit: false,
                 flipped: false,
                 cardNumber: form3Data && form3Data.cardNumber || null,
                 cardHolderName: form3Data && form3Data.cardHolderName || '',
                 securityCode: form3Data && form3Data.securityCode || null,
-                expirationDate:  form3Data && form3Data.expirationDate || null,
+                expirationDate: form3Data && form3Data.expirationDate || null,
                 activeCreditCardName: null,
+                dambul: null,
                 mask: '#### #### #### ####',
                 cardColor1: null,
                 cardColor2: null,
@@ -167,7 +174,7 @@
                     list: [
                         {
                             brand: 'AmEx',
-                            image: '/img/AmEx.c79ad081.svg',
+                            image: '@/assets/ccIcons/AmEx.svg',
                             verification: '^3[47][0-9]',
                             mask: '#### ###### #####',
                             color1: '#ffeb3b',
@@ -194,7 +201,7 @@
 
                         },
                         {
-                            brand: 'Hyper Card',
+                            brand: 'HyperCard',
                             image: '/img/HiperCard.b987fe1f.svg',
                             verification: '^3(?:0[0-5]|[68][0-9])[0-9]',
                             mask: '#### #### #### ####',
@@ -212,17 +219,17 @@
         methods: {
             onSubmit(prev) {
                 this.attemptSubmit = true;
-                const {ccValidLength, expirationDate, cardHolderName, securityCode, cardNumber } = this;
-                if ( ccValidLength && expirationDate.length === 5 &&cardHolderName && securityCode ) {
+                const {ccValidLength, expirationDate, cardHolderName, securityCode, cardNumber} = this;
+                if (ccValidLength && expirationDate.length === 5 && cardHolderName && securityCode) {
                     const propsToPass = {
                         cardNumber,
                         cardHolderName,
                         securityCode,
                         expirationDate,
-                        step: prev? prev: 4,
+                        step: prev ? prev : 4,
                     };
                     this.$emit('onSubmitStep3', propsToPass);
-                }else {
+                } else {
                     console.log('error in step 3');
                 }
             },
@@ -231,6 +238,7 @@
                     if (this.cardNumber.match(new RegExp(this.creditcards.list[i].verification))) {
                         this.creditcards.active = i + 1;
                         this.activeCreditCardName = this.creditcards.list[i].image;
+                        this.dambul = this.creditcards.list[i].brand;
                         this.mask = this.creditcards.list[i].mask;
                         this.cardColor1 = this.creditcards.list[i].color1;
                         this.cardColor2 = this.creditcards.list[i].color2;
@@ -417,6 +425,9 @@
     }
 
     .ccIcon {
+        /*border: 1px solid red;*/
+        /*width: 200px;*/
+        /*height: 100px;*/
         position: absolute;
         top: 20%;
         right: 16%;
