@@ -1,23 +1,26 @@
 <template>
     <form @submit.prevent="submit()">
-        <input id="emailInput" v-bind:class="{'invalid': !email && attemptSubmit}"
+        <input id="emailInput"
+               v-bind:class="{'invalid': !email && attemptSubmit}"
                v-model="email"
-               @blur="onBlurMixin('emailInput')" @focus="onFocusMixin('emailInput')"
+               @blur="onBlurMixin('emailInput')"
+               @focus="onFocusMixin('emailInput')"
                @input="onBlurMixin('emailInput')"
-               type="email" placeholder="Email...">
-        <input id="passwordInput" v-bind:class="{'invalid': !password && attemptSubmit}"
+               type="email"
+               placeholder="Email...">
+        <input id="passwordInput"
+               v-bind:class="{'invalid': !password && attemptSubmit}"
                v-model="password"
-               @blur="onBlurMixin('passwordInput')" @focus="onFocusMixin('passwordInput')"
+               @blur="onBlurMixin('passwordInput')"
+               @focus="onFocusMixin('passwordInput')"
                @input="onBlurMixin('emailInput')"
-               type="password" placeholder="Password..."
-        >
+               type="password" placeholder="Password...">
         <input id="confirmPasswordInput"
                v-bind:class="{'invalid': (!confirmPassword && attemptSubmit) || (confirmPassword !== password)}"
                v-model="confirmPassword"
                @blur="onBlurMixin('confirmPasswordInput')" @focus="onFocusMixin('confirmPasswordInput')"
                @input="onBlurMixin('emailInput')"
-               type="password" placeholder="Password..."
-        >
+               type="password" placeholder="Password...">
         <p v-if="(!confirmPassword && attemptSubmit) || (confirmPassword !== password)">*Password don't match!</p>
         <button type="button" @click="prev()">Previous</button>
         <button type="submit">Next</button>

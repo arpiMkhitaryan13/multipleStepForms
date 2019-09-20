@@ -1,11 +1,15 @@
 <template>
     <form @submit.prevent="submit()">
-        <input id="nameInput" v-bind:class="{'invalid': !name && attemptSubmit}" v-model="name"
-               @blur="onBlurMixin('nameInput')" @focus="onFocusMixin('nameInput')"
-               @input="onInput('nameInput')"
-               placeholder="First name..."/>
-        <p v-if="!name && attemptSubmit" class="error-message">*The name field is required</p>
-
+        <div>
+            <input id="nameInput"
+                   v-bind:class="{'invalid': !name && attemptSubmit}"
+                   v-model="name"
+                   @blur="onBlurMixin('nameInput')"
+                   @focus="onFocusMixin('nameInput')"
+                   @input="onInput('nameInput')"
+                   placeholder="First name..."/>
+            <p v-if="!name && attemptSubmit">*The name field is required</p>
+        </div>
         <input id="lastNameInput" v-bind:class="{'invalid': !lastName && attemptSubmit}" v-model="lastName"
                @input="onInput('lastNameInput')"
                @blur="onBlurMixin('lastNameInput')" @focus="onFocusMixin('lastNameInput')"
@@ -25,8 +29,7 @@
                @blur="onBlurMixin('cityNameInput')" @focus="onFocusMixin('cityNameInput')"
                @input="onlyLetter('cityNameInput')"
                maxlength="8" minlength="3"
-               placeholder="City..."
-        />
+               placeholder="City..."/>
         <p v-if="!city && attemptSubmit" class="error-message">*The city field is required</p>
         <p v-if="city && city.length <= 3" class="error-message">*More than 3 characters</p>
 
@@ -45,8 +48,11 @@
         />
         <p v-if="!isPostalCodeValid && postalCode" class="error-message">*Please enter valid postal code</p>
 
-        <input class="shippingCheckbox" v-on:change="check" type="checkbox" name="shipping" value=""> Use filled data
-        for shipping<br>
+        <input class="shippingCheckbox"
+               v-on:change="check"
+               type="checkbox"
+               name="shipping">
+        <span>Use filled data for shipping</span><br>
 
         <select v-bind:class="{'invalid':!shippingCountry && attemptSubmit && !checked, 'unused':checked}"
                 v-model="checked?country:shippingCountry"

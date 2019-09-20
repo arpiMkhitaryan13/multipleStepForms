@@ -1,14 +1,19 @@
 <template>
-    <div>
+    <div class="wrapper">
         <div class="container ">
             <div class="creditcard">
-                <div class="front" v-bind:style="{'display': flipped? 'none' : 'contents'}" v-on:click="onFlipCard">
+                <div class="front" v-bind:class="{'flippedFront': !flipped}"
+                     v-on:click="onFlipCard">
                     <img class="ccIcon"
                          v-if="creditCardName && cardNumber && !flipped"
                          v-bind:src="require(`@/assets/ccIcons/${creditCardName}.svg`)">
-
-                    <svg version="1.1" id="cardfront" xmlns="http://www.w3.org/2000/svg"
-                         x="0px" y="0px" viewBox="0 0 750 471" style="enable-background:new 0 0 750 471;"
+                    <svg version="1.1"
+                         id="cardfront"
+                         xmlns="http://www.w3.org/2000/svg"
+                         x="0px"
+                         y="0px"
+                         viewBox="0 0 750 471"
+                         style="enable-background:new 0 0 750 471;"
                          xml:space="preserve">
                     <g id="Front">
                         <g id="CardBackground">
@@ -16,8 +21,8 @@
                                 <g id="amex_1_">
                                     <path v-bind:style="{'fill': cardColor1 && cardNumber? cardColor1: 'grey'}"
                                           id="Rectangle-1_1_"
-                                          class="lightcolor grey" d="M40,0h670c22.1,0,40,17.9,40,40v391c0,22.1-17.9,40-40,40H40c-22.1,0-40-17.9-40-40V40
-                            C0,17.9,17.9,0,40,0z"/>
+                                          class="lightcolor grey"
+                                          d="M40,0h670c22.1,0,40,17.9,40,40v391c0,22.1-17.9,40-40,40H40c-22.1,0-40-17.9-40-40V40 C0,17.9,17.9,0,40,0z"/>
                                 </g>
                             </g>
                             <path v-bind:style="{'fill': cardColor2 && cardNumber? cardColor2: 'a0a0a2'}"
@@ -72,7 +77,8 @@
                     </g>
                 </svg>
                 </div>
-                <div class="back" v-bind:class="{'flipped': flipped}" v-on:click="onFlipCard">
+                <div class="back" v-bind:class="{'flippedBack': flipped}"
+                     v-on:click="onFlipCard">
                     <svg version="1.1" id="cardback" xmlns="http://www.w3.org/2000/svg"
                          x="0px" y="0px" viewBox="0 0 750 471" style="enable-background:new 0 0 750 471;"
                          xml:space="preserve">
@@ -110,42 +116,45 @@
                 </div>
             </div>
         </div>
-        <form @submit.prevent="onSubmit()">
-            <input id="ccNumberInput"
-                   v-bind:class="{'invalid':(!cardNumber && attemptSubmit) || (cardNumber && !ccValidLength) }"
-                   v-model="cardNumber"
-                   @blur="onBlurMixin('ccNumberInput')" @focus="onFocusMixin('ccNumberInput')"
-                   @input="checkValidation('ccNumberInput')"
-                   v-mask="mask" placeholder="Card number..." type="text"
-                   :maxlength="ccValidLength || 20"
-            >
-            <p v-if="(!cardNumber && attemptSubmit) || (cardNumber && !ccValidLength)">*Enter valid card number</p>
-            <input id="ccNameInput" :class="{'invalid' : !cardHolderName && attemptSubmit}"
-                   v-model="cardHolderName"
-                   @blur="onBlurMixin('ccNameInput')" @focus="onFocusMixin('ccNameInput')"
-                   @input="disableNumberInput('ccNameInput')"
-                   placeholder="Cardholder name..."
-                   @paste.prevent maxlength="21"
-            >
-            <input id="ccSecurityCode" :class="{'invalid' : !securityCode && attemptSubmit}"
-                   v-model="securityCode"
-                   @blur="onBlurMixin('ccSecurityCode')" @focus="onFocusMixin('ccSecurityCode')"
-                   @input="disableLetterInput('ccSecurityCode')"
-                   placeholder="Security code..." @click="onFlipCard('back')"
-                   maxlength="4"
-            >
-            <input id="ccDate" :class="{'invalid' : !expirationDate && attemptSubmit}"
-                   v-model="expirationDate"
-                   @blur="onBlurMixin('ccDate')" @focus="onFocusMixin('ccDate')"
-                   v-mask="'##/##'"
-                   @input="dateValidation('ccDate')"
-                   type="text" placeholder="Expiration date..."
-            >
-            <p v-if="(!expirationDate && attemptSubmit) || expirationDate && expirationDate.length !== 5">*Enter valid
-                date until 2024</p>
-            <button type="button" v-on:click="prev()">Previous</button>
-            <button>Submit</button>
-        </form>
+        <div class="creditCardForm">
+            <form @submit.prevent="onSubmit()">
+                <input id="ccNumberInput"
+                       v-bind:class="{'invalid':(!cardNumber && attemptSubmit) || (cardNumber && !ccValidLength) }"
+                       v-model="cardNumber"
+                       @blur="onBlurMixin('ccNumberInput')" @focus="onFocusMixin('ccNumberInput')"
+                       @input="checkValidation('ccNumberInput')"
+                       v-mask="mask" placeholder="Card number..." type="text"
+                       :maxlength="ccValidLength || 20"
+                >
+                <p v-if="(!cardNumber && attemptSubmit) || (cardNumber && !ccValidLength)">*Enter valid card number</p>
+                <input id="ccNameInput" :class="{'invalid' : !cardHolderName && attemptSubmit}"
+                       v-model="cardHolderName"
+                       @blur="onBlurMixin('ccNameInput')" @focus="onFocusMixin('ccNameInput')"
+                       @input="disableNumberInput('ccNameInput')"
+                       placeholder="Cardholder name..."
+                       @paste.prevent maxlength="21"
+                >
+                <input id="ccSecurityCode" :class="{'invalid' : !securityCode && attemptSubmit}"
+                       v-model="securityCode"
+                       @blur="onBlurMixin('ccSecurityCode')" @focus="onFocusMixin('ccSecurityCode')"
+                       @input="disableLetterInput('ccSecurityCode')"
+                       placeholder="Security code..." @click="onFlipCard('back')"
+                       maxlength="4"
+                >
+                <input id="ccDate" :class="{'invalid' : !expirationDate && attemptSubmit}"
+                       v-model="expirationDate"
+                       @blur="onBlurMixin('ccDate')" @focus="onFocusMixin('ccDate')"
+                       v-mask="'##/##'"
+                       @input="dateValidation('ccDate')"
+                       type="text" placeholder="Expiration date..."
+                >
+                <p v-if="(!expirationDate && attemptSubmit) || expirationDate && expirationDate.length !== 5">*Enter
+                    valid
+                    date until 2024</p>
+                <button type="button" v-on:click="prev()">Previous</button>
+                <button>Submit</button>
+            </form>
+        </div>
     </div>
 </template>
 
@@ -257,17 +266,21 @@
         padding: 25px 50px;
 
     }
-    @media screen and (max-width: 400px){
-.container {
-    padding: 10px 20px ;
-}
-    }
     /* FRONT OF CARD */
     #svgname {
         text-transform: uppercase;
         font-size: 2em;
     }
 
+    form {
+        margin: 16em auto 0;
+    }
+
+    @media screen and (max-width: 400px) {
+        form {
+            margin-top: 10em;
+        }
+    }
     /*cc chip icon*/
     .st2 {
         fill: #FFFFFF;
@@ -285,7 +298,6 @@
         opacity: 0.6;
         fill: #FFFFFF;
         font-size: 24px;
-
     }
 
     /*date in front*/
@@ -353,14 +365,17 @@
         max-width: 400px;
         backface-visibility: hidden;
         color: #47525d;
+        transform: rotateY(180deg);
+        transition: .5s;
+        transform-origin: center;
     }
 
-    .back {
-        transform: rotateX(180deg);
+    .flippedBack {
+        transform: rotateY(0);
     }
 
-    .flipped {
-        display: contents;
+    .flippedFront {
+        transform: rotateY(0);
     }
 
     .ccIcon {
@@ -369,10 +384,18 @@
         height: 50%;
     }
 
-    .creditcard {
-        position: relative;
-    }
     .invalid {
         border-color: red !important;
     }
+
+    .creditcard {
+        position: relative;
+    }
+
+    .wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
 </style>

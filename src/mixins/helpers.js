@@ -2,11 +2,11 @@ export default {
     methods: {
         onBlurMixin(id, checked) {
             let element = document.getElementById(id);
-            if(element){
+            if (element) {
                 if (!element.value && !checked) {
                     element.style.borderColor = "red";
                 } else {
-                        element.style.borderColor = "#216288";
+                    element.style.borderColor = "#216288";
                 }
             }
         },
