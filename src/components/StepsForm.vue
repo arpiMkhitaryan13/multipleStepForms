@@ -5,11 +5,11 @@
 
             <div class='step' v-if="currentStep === 1">
                 <step1 v-bind:countries="countries" v-bind:form1Data="form1Data"
-                       @clicked="onClickChild"></step1>
+                       @onSubmitStep1="onSubmitStep1"></step1>
             </div>
 
             <div class='step' v-if="currentStep === 2">
-                <step2 v-bind:countries="countries" v-bind:form2Data="form2Data" @clicked="onClickSecondChild"></step2>
+                <step2 v-bind:countries="countries" v-bind:form2Data="form2Data" @onSubmitStep2="onSubmitStep2"></step2>
             </div>
 
             <div class='step' v-if="currentStep === 3">
@@ -40,7 +40,7 @@
         },
         data() {
             return {
-                currentStep: 3,
+                currentStep: 1,
                 totalSteps: 4,
                 countries: null,
                 form1Data: null,
@@ -53,22 +53,19 @@
         },
 
         methods: {
-            prev() {
-                this.currentStep--;
-            },
             submit() {
-                if (this.form3Data) {
-                    console.log('succsess:', this.form3Data, this.form2Data);
+                if (this.form3Data && this.form2Data && this.form1Data) {
+                    console.log('succsess:', [this.form3Data, this.form2Data, this.form1Data ]);
                 } else {
                     console.log('error');
                 }
             },
 
-            onClickChild(value) {
+            onSubmitStep1(value) {
                 this.form1Data = value;
                 this.currentStep = value.step;
             },
-            onClickSecondChild(value) {
+            onSubmitStep2(value) {
                 if (value) {
                     this.form2Data = value;
                     this.currentStep = value.step;
@@ -78,13 +75,6 @@
                         this.currentStep = 1;
                     }
                 }
-                // else {
-                //     if(value.step === 2){
-                //         this.currentStep = 3
-                //     }else{
-                //         this.currentStep = 1;
-                //     }
-                // }
             },
             onSubmitStep3(value){
                 if(value) {
@@ -94,7 +84,7 @@
                 if(this.currentStep === 4)
                 {
                     this.submit();
-                };
+                }
             },
 
             fetchData() {

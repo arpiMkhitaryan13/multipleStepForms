@@ -1,0 +1,37 @@
+{
+  "list": [
+    {
+      "brand": "AmEx",
+     "verification" : "^3[47][0-9]",
+      "mask": "#### ###### #####",
+      "color1": "#ffeb3b",
+      "color2": "#f9a825",
+      "length": 15
+    },
+    {
+      "brand": "MasterCard",
+      "verification": "^5[1-5][0-9]",
+      "mask": "#### #### #### ####",
+      "color1": "#03A9F4",
+      "color2": "#0288D1",
+      "length": 16
+    },
+    {
+      "brand": "Visa",
+      "verification": "^4[0-9]",
+      "mask": "#### #### #### ####",
+      "color1": "#66bb6a",
+      "color2": "#388e3c",
+      "length": 16
+
+    },
+    {
+      "brand": "HiperCard",
+      "verification": "^3(?:0[0-5]|[68][0-9])[0-9]",
+      "mask": "#### #### #### ####",
+      "color1": "#ef5350",
+      "color2": "#d32f2f",
+      "length": 14
+    }
+  ]
+}

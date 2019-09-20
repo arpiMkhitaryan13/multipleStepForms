@@ -9,13 +9,17 @@ export default {
                         element.style.borderColor = "#216288";
                 }
             }
-
         },
         onFocusMixin(id) {
             let element = document.getElementById(id);
             if(element){
                 element.style.borderColor = "#216288";
             }
+        },
+        disableNumberInput(id) {
+            this.cardHolderName = this.cardHolderName.replace(/[0-9]/g,  '');
+            this.onBlurMixin(id);
+            this.onFlipCard('front');
         },
     }
 }

@@ -1,16 +1,18 @@
 <template>
     <form @submit.prevent="submit()">
-        <input v-on:input="blurField('nameInput')" v-bind:class="{'invalid': !name && attemptSubmit}" id="nameInput"
-               v-on:blur="blurField('nameInput')" v-on:focus="focusField('nameInput')" placeholder="First name..."
-               v-model="name"/>
+        <input id="nameInput" v-bind:class="{'invalid': !name && attemptSubmit}" v-model="name"
+               @blur="onBlurMixin('nameInput')" @focus="onFocusMixin('nameInput')"
+               @input="onInput('nameInput')"
+               placeholder="First name..."/>
         <p v-if="!name && attemptSubmit" class="error-message">*The name field is required</p>
 
-        <input v-on:input="blurField('lastNameInput')" v-bind:class="{'invalid': !lastName && attemptSubmit}"
-               id="lastNameInput" v-on:blur="blurField('lastNameInput')" v-on:focus="focusField('lastNameInput')"
-               placeholder="Last name..." v-model="lastName"/>
+        <input id="lastNameInput" v-bind:class="{'invalid': !lastName && attemptSubmit}" v-model="lastName"
+               @input="onInput('lastNameInput')"
+               @blur="onBlurMixin('lastNameInput')" @focus="onFocusMixin('lastNameInput')"
+               placeholder="Last name..."/>
         <p v-if="!lastName && attemptSubmit" class="error-message">*The last name field is required</p>
 
-        <select v-model="country" v-bind:class="{'invalid':!country && attemptSubmit}">
+        <select v-bind:class="{'invalid':!country && attemptSubmit}" v-model="country">
             <option value="" disabled hidden>Choose your Country</option>
             <option v-for="country in countries" v-bind:value="country.Country">
                 {{ country.Country }}
@@ -18,29 +20,37 @@
         </select>
         <p v-if="!country && attemptSubmit" class="error-message">*The country field is required</p>
 
-        <input maxlength="8" minlength="3" v-on:input="onlyLetter('cityNameInput')"
-               v-bind:class="{'invalid':(!city && attemptSubmit)|| city && city.length <= 3}" id="cityNameInput"
-               v-on:blur="blurField('cityNameInput')" v-on:focus="focusField('cityNameInput')" placeholder="City"
-               v-model="city"/>
+        <input id="cityNameInput" v-bind:class="{'invalid':(!city && attemptSubmit)|| city && city.length <= 3}"
+               v-model="city"
+               @blur="onBlurMixin('cityNameInput')" @focus="onFocusMixin('cityNameInput')"
+               @input="onlyLetter('cityNameInput')"
+               maxlength="8" minlength="3"
+               placeholder="City..."
+        />
         <p v-if="!city && attemptSubmit" class="error-message">*The city field is required</p>
         <p v-if="city && city.length <= 3" class="error-message">*More than 3 characters</p>
 
-        <input v-on:input="regex('addressInput')" v-bind:class="{'invalid':!address && attemptSubmit}"
-               id="addressInput" v-on:blur="blurField('addressInput')" v-on:focus="focusField('addressInput')"
-               placeholder="Address..." v-model="address"/>
+        <input id="addressInput" v-bind:class="{'invalid':!address && attemptSubmit}"
+               v-model="address"
+               @blur="onBlurMixin('addressInput')" @focus="onFocusMixin('addressInput')"
+               @input="addressValidation('addressInput')"
+               placeholder="Address..."/>
         <p v-if="!address && attemptSubmit" class="error-message">*The address field is required</p>
 
-        <input v-on:input="blurField('postalCodeInput')" v-bind:class="{'invalid':!isPostalCodeValid }"
-               id="postalCodeInput" v-on:blur="blurField('postalCodeInput')"
-               v-on:focus="focusField('postalCodeInput')" type="text" placeholder="Postal Code..."
-               v-model="postalCode"/>
+        <input id="postalCodeInput" v-bind:class="{'invalid':!isPostalCodeValid }"
+               v-model="postalCode"
+               @blur="onBlurMixin('postalCodeInput')" @focus="onFocusMixin('postalCodeInput')"
+               @input="onInput('postalCodeInput')"
+               type="text" placeholder="Postal Code..."
+        />
         <p v-if="!isPostalCodeValid && postalCode" class="error-message">*Please enter valid postal code</p>
 
-        <input v-on:change="check" class="shippingCheckbox" type="checkbox" name="shipping" value=""> Use filled data
+        <input class="shippingCheckbox" v-on:change="check" type="checkbox" name="shipping" value=""> Use filled data
         for shipping<br>
 
-        <select :disabled="checked" v-model="checked?country:shippingCountry"
-                v-bind:class="{'invalid':!shippingCountry && attemptSubmit && !checked, 'unused':checked}">
+        <select v-bind:class="{'invalid':!shippingCountry && attemptSubmit && !checked, 'unused':checked}"
+                v-model="checked?country:shippingCountry"
+                :disabled="checked">
             <option value="" disabled hidden>Choose your Country</option>
             <option v-for="country in countries" v-bind:value="country.Country">
                 {{ country.Country }}
@@ -49,26 +59,35 @@
         <p v-if="!shippingCountry && attemptSubmit && !checked" class="error-message">*The country field is
             required</p>
 
-        <input v-on:input="blurField('shippingCityNameInput')"
+        <input id="shippingCityNameInput"
                v-bind:class="{'invalid':!shippingCity && attemptSubmit && !checked, 'unused':checked}"
-               :disabled="checked" id="shippingCityNameInput" v-on:blur="blurField('shippingCityNameInput')"
-               v-on:focus="focusField('shippingCityNameInput')" placeholder="City"
-               v-model="checked?city:shippingCity"/>
+               v-model="checked?city:shippingCity"
+               @blur="onBlurMixin('shippingCityNameInput')" @focus="onFocusMixin('shippingCityNameInput')"
+               @input="onInput('shippingCityNameInput')"
+               :disabled="checked"
+               placeholder="City..."
+        />
         <p v-if="!shippingCity && attemptSubmit && !checked" class="error-message">*The city field is required</p>
 
-        <input v-on:input="blurField('shippingAddressInput')"
+        <input id="shippingAddressInput"
                v-bind:class="{'invalid':!shippingAddress && attemptSubmit && !checked, 'unused':checked}"
-               :disabled="checked" id="shippingAddressInput" v-on:blur="blurField('shippingAddressInput')"
-               v-on:focus="focusField('shippingAddressInput')" placeholder="Address..."
-               v-model="checked?address:shippingAddress"/>
-        <p v-if="!shippingAddress && attemptSubmit && !checked" class="error-message">*The address field is
+               v-model="checked?address:shippingAddress"
+               @blur="onBlurMixin('shippingAddressInput')" @focus="onFocusMixin('shippingAddressInput')"
+               @input="onInput('shippingAddressInput')"
+               :disabled="checked"
+               placeholder="Address..."
+        />
+        <p v-if="!shippingAddress && attemptSubmit && !checked">*The address field is
             required</p>
 
-        <input v-on:input="blurField('shippingPostalCode')"
+        <input id="shippingPostalCode"
                v-bind:class="{'invalid':!isShippingPostalCodeValid && !checked, 'unused':checked}"
-               :disabled="checked" id="shippingPostalCode" v-on:blur="blurField('shippingPostalCode')"
-               v-on:focus="focusField('shippingPostalCode')" type="text" placeholder="Postal Code..."
-               v-model="checked?postalCode:shippingPostalCode"/>
+               v-model="checked?postalCode:shippingPostalCode"
+               @blur="onBlurMixin('shippingPostalCode')" @focus="onFocusMixin('shippingPostalCode')"
+               @input="onInput('shippingPostalCode')"
+               :disabled="checked" type="text"
+               placeholder="Postal Code..."
+        />
         <p v-if="!isShippingPostalCodeValid && shippingPostalCode && !checked" class="error-message">*Please enter
             valid postal code</p>
 
@@ -77,8 +96,11 @@
 </template>
 
 <script>
+    import helpers from "../mixins/helpers";
+
     export default {
         props: ['countries', 'form1Data'],
+        mixins: [helpers],
         data() {
             const {form1Data} = this;
             return {
@@ -122,32 +144,25 @@
                             shippingPostalCode: checked ? postalCode : shippingPostalCode,
                         }
                     };
-                    this.$emit('clicked', propsToPass);
+                    this.$emit('onSubmitStep1', propsToPass);
                 } else {
                     console.log('error in step 1');
                 }
             },
-            blurField(id) {
-                if (!document.getElementById(id).value && !this.checked) {
-                    document.getElementById(id).style.borderColor = "red";
-                } else {
-                    this.focusField(id)
-                }
-            },
-            focusField(id) {
-                document.getElementById(`${id}`).style.borderColor = "#216288";
+            onInput(id) {
+                this.onBlurMixin(id, this.checked);
             },
             onlyLetter(id) {
                 this.city = this.city.replace(/[0-9]/g, '');
-                this.blurField(id);
+                this.onBlurMixin(id);
             },
-            regex(id) {
+            addressValidation(id) {
                 if (Number(this.address[0])) {
                     this.address = this.address[0] + this.address.substr(1).replace(/[0-9]/g, '');
                 } else {
                     this.address = this.address.replace(/./g, '')
                 }
-                this.blurField(id);
+                this.onBlurMixin(id);
             },
             postalCodeValidation(postalCode) {
                 const selectedCountry = this.countries.find(o => Object.keys(o).some(k => o[k].toLowerCase().includes(this.country.toLowerCase())));
@@ -176,11 +191,13 @@
                 }
             },
             isFormValid() {
-                const {name, lastName, city, address, country, shippingCity, shippingAddress, shippingPostalCode, isPostalCodeValid, isShippingPostalCodeValid} = this;
+                const { name, lastName, city, address, country, isPostalCodeValid } = this;
                 if (this.checked) {
                     return name && lastName && address && !!city && country && isPostalCodeValid;
                 } else {
-                    return name && lastName && shippingCity && shippingAddress && shippingPostalCode && address && !!city && isShippingPostalCodeValid;
+                    for(let key in this.$data)
+                        if(!this.$data[key]) return false;
+                    return true;
                 }
             }
         }
@@ -188,10 +205,6 @@
 </script>
 
 <style scoped>
-    p {
-        color: red;
-    }
-
     .shippingCheckbox {
         display: inline;
         min-height: unset;
