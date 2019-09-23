@@ -263,7 +263,7 @@
     .container {
         max-width: 400px;
         max-height: 251px;
-        padding: 25px 50px;
+        padding: 20px 50px;
 
     }
     /* FRONT OF CARD */
@@ -397,5 +397,4 @@
         flex-direction: column;
         justify-content: space-between;
     }
-
 </style>
