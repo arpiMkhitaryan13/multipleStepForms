@@ -1,6 +1,6 @@
 <template>
     <form @submit.prevent="submit()">
-        <div>
+        <div class="inputWrapper">
             <input id="nameInput"
                    v-bind:class="{'invalid': !name && attemptSubmit}"
                    v-model="name"
@@ -10,59 +10,65 @@
                    placeholder="First name..."/>
             <p v-if="!name && attemptSubmit">*The name field is required</p>
         </div>
-        <div>
+        <div class="inputWrapper">
             <input id="lastNameInput" v-bind:class="{'invalid': !lastName && attemptSubmit}" v-model="lastName"
                    @input="onInput('lastNameInput')"
                    @blur="onBlurMixin('lastNameInput')" @focus="onFocusMixin('lastNameInput')"
                    placeholder="Last name..."/>
             <p v-if="!lastName && attemptSubmit" class="error-message">*The last name field is required</p>
         </div>
-        <div>
+        <div class="inputWrapper">
             <select v-bind:class="{'invalid':!country && attemptSubmit}" v-model="country">
                 <option value="" disabled hidden>Choose your Country</option>
-                <option v-for="country in countries" v-bind:value="country.Country">
+                <option v-for="country in countries" v-bind:value=country.Country>
                     {{ country.Country }}
                 </option>
             </select>
             <p v-if="!country && attemptSubmit" class="error-message">*The country field is required</p>
         </div>
-        <div>
-            <input id="cityNameInput" v-bind:class="{'invalid':(!city && attemptSubmit)|| city && city.length <= 3}"
+        <div class="inputWrapper">
+            <input id="cityNameInput"
+                   v-bind:class="{'invalid':(!city && attemptSubmit)|| city && city.length <= 3}"
                    v-model="city"
-                   @blur="onBlurMixin('cityNameInput')" @focus="onFocusMixin('cityNameInput')"
+                   @blur="onBlurMixin('cityNameInput')"
+                   @focus="onFocusMixin('cityNameInput')"
                    @input="onlyLetter('cityNameInput')"
-                   maxlength="8" minlength="3"
+                   maxlength="8"
+                   minlength="3"
                    placeholder="City..."/>
             <p v-if="!city && attemptSubmit" class="error-message">*The city field is required</p>
             <p v-if="city && city.length <= 3" class="error-message">*More than 3 characters</p>
         </div>
-        <div>
-            <input id="addressInput" v-bind:class="{'invalid':!address && attemptSubmit}"
+        <div class="inputWrapper">
+            <input id="addressInput"
+                   v-bind:class="{'invalid':!address && attemptSubmit}"
                    v-model="address"
-                   @blur="onBlurMixin('addressInput')" @focus="onFocusMixin('addressInput')"
+                   @blur="onBlurMixin('addressInput')"
+                   @focus="onFocusMixin('addressInput')"
                    @input="addressValidation('addressInput')"
                    placeholder="Address..."/>
             <p v-if="!address && attemptSubmit" class="error-message">*The address field is required</p>
         </div>
-        <div>
-            <input id="postalCodeInput" v-bind:class="{'invalid':!isPostalCodeValid }"
+        <div class="inputWrapper">
+            <input id="postalCodeInput"
+                   v-bind:class="{'invalid':!isPostalCodeValid }"
                    v-model="postalCode"
                    @blur="onBlurMixin('postalCodeInput')" @focus="onFocusMixin('postalCodeInput')"
                    @input="onInput('postalCodeInput')"
-                   type="text" placeholder="Postal Code..."
-            />
+                   type="text"
+                   placeholder="Postal Code..."/>
             <p v-if="!isPostalCodeValid && postalCode" class="error-message">*Please enter valid postal code</p>
         </div>
-        <div>
+        <div class="inputWrapper">
             <input class="shippingCheckbox"
                    v-on:change="check"
                    type="checkbox"
                    name="shipping">
             <span>Use filled data for shipping</span><br>
         </div>
-        <div>
+        <div class="inputWrapper">
             <select v-bind:class="{'invalid':!shippingCountry && attemptSubmit && !checked, 'unused':checked}"
-                    v-model="checked?country:shippingCountry"
+                    v-model="abracadabra"
                     :disabled="checked">
                 <option value="" disabled hidden>Choose your Country</option>
                 <option v-for="country in countries" v-bind:value="country.Country">
@@ -72,7 +78,7 @@
             <p v-if="!shippingCountry && attemptSubmit && !checked" class="error-message">*The country field is
                 required</p>
         </div>
-        <div>
+        <div class="inputWrapper">
             <input id="shippingCityNameInput"
                    v-bind:class="{'invalid':!shippingCity && attemptSubmit && !checked, 'unused':checked}"
                    v-model="checked?city:shippingCity"
@@ -83,7 +89,7 @@
             />
             <p v-if="!shippingCity && attemptSubmit && !checked" class="error-message">*The city field is required</p>
         </div>
-        <div>
+        <div class="inputWrapper">
             <input id="shippingAddressInput"
                    v-bind:class="{'invalid':!shippingAddress && attemptSubmit && !checked, 'unused':checked}"
                    v-model="checked?address:shippingAddress"
@@ -95,15 +101,14 @@
             <p v-if="!shippingAddress && attemptSubmit && !checked">*The address field is
                 required</p>
         </div>
-        <div>
+        <div class="inputWrapper">
             <input id="shippingPostalCode"
                    v-bind:class="{'invalid':!isShippingPostalCodeValid && !checked, 'unused':checked}"
                    v-model="checked?postalCode:shippingPostalCode"
                    @blur="onBlurMixin('shippingPostalCode')" @focus="onFocusMixin('shippingPostalCode')"
                    @input="onInput('shippingPostalCode')"
                    :disabled="checked" type="text"
-                   placeholder="Postal Code..."
-            />
+                   placeholder="Postal Code..."/>
             <p v-if="!isShippingPostalCodeValid && shippingPostalCode && !checked" class="error-message">*Please enter
                 valid postal code</p>
         </div>
@@ -120,6 +125,7 @@
         data() {
             const {form1Data} = this;
             return {
+                abracadabra: this.checked ? this.country : this.shippingCountry,
                 attemptSubmit: false,
                 checked: form1Data && form1Data.checked || false,
                 name: form1Data && form1Data.name || null,
@@ -236,4 +242,8 @@
         background-color: rgb(235, 235, 228);
         border-color: unset !important;
     }
+    /*.inputWrapper {*/
+    /*    width: 60%;*/
+    /*    margin: 0 auto;*/
+    /*}*/
 </style>

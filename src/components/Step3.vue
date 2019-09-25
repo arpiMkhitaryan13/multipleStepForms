@@ -151,8 +151,10 @@
                 <p v-if="(!expirationDate && attemptSubmit) || expirationDate && expirationDate.length !== 5">*Enter
                     valid
                     date until 2024</p>
-                <button type="button" v-on:click="prev()">Previous</button>
-                <button>Submit</button>
+                <div class="buttonWrapper">
+                    <button type="button" @click="prev()">Previous</button>
+                    <button>Submit</button>
+                </div>
             </form>
         </div>
     </div>

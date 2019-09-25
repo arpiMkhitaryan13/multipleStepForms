@@ -22,12 +22,17 @@
                @input="onBlurMixin('emailInput')"
                type="password" placeholder="Password...">
         <p v-if="(!confirmPassword && attemptSubmit) || (confirmPassword !== password)">*Password don't match!</p>
-        <button type="button" @click="prev()">Previous</button>
-        <button type="submit">Next</button>
+        <div class="buttonWrapper">
+            <button type="button" @click="prev()">Previous</button>
+            <button type="submit">Next</button>
+        </div>
+
     </form>
 </template>
 
 <script>
+
+
     import helpers from "../mixins/helpers";
 
     export default {

@@ -9,7 +9,7 @@
                 </step1>
             </div>
             <div class='step' v-if="currentStep === 2">
-                <step2 v-bind:countries="countries" v-bind:form2Data="form2Data" @onSubmitStep2="onSubmitStep2"></step2>
+                <step2 v-bind:form2Data="form2Data" @onSubmitStep2="onSubmitStep2"></step2>
             </div>
             <div class='step' v-if="currentStep === 3">
                 <step3 v-bind:_cardHolderName="form1Data && form1Data.name"
@@ -41,7 +41,7 @@
         },
         data() {
             return {
-                currentStep: 3,
+                currentStep: 2,
                 totalSteps: 4,
                 countries: null,
                 form1Data: null,

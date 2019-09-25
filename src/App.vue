@@ -54,9 +54,31 @@
         margin: .5em auto;
         outline: none;
         border: 1px solid #216288;
+        padding-left: 1em;
+    }
+
+    input::placeholder {
+        padding-left: 1em;
+    }
+
+    input:focus::placeholder {
+        color: transparent;
+    }
+
+    select {
+        width: calc(60% + 1em);
     }
 
     p {
         color: red;
+    }
+    .buttonWrapper {
+        width: 100%;
+        display:flex;
+        justify-content: center;
+    }
+    .buttonWrapper button {
+        width: 20%;
+        margin: 5px;
     }
 </style>
