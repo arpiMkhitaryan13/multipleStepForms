@@ -76,9 +76,19 @@
         width: 100%;
         display:flex;
         justify-content: center;
+        perspective: 700px;
     }
     .buttonWrapper button {
         width: 20%;
         margin: 5px;
+        transform-style: preserve-3d;
+        min-height: 3em;
+        transition: .5s;
+
+    }
+    .buttonWrapper button:hover{
+        transform: scale(1.1);
+        background-color: #00b894;
+        border: none;
     }
 </style>
