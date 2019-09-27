@@ -195,8 +195,8 @@
         methods: {
             onSubmit(prev) {
                 this.attemptSubmit = true;
-                const {ccValidLength, expirationDate, cardHolderName, securityCode, cardNumber} = this;
-                if (ccValidLength && expirationDate.length === 5 && cardHolderName && securityCode) {
+                const {ccValidLength, expirationDate, cardHolderName, securityCode, cardNumber, step} = this;
+                if ((ccValidLength && expirationDate && expirationDate.length === 5 && cardHolderName && securityCode) || step === 2) {
                     const propsToPass = {
                         cardNumber,
                         cardHolderName,
@@ -245,10 +245,19 @@
                 this.onFlipCard('back');
             },
             dateValidation(id) {
-                let month = Number(this.expirationDate.split('/')[0]);
-                let year = Number(this.expirationDate.split('/')[1]);
-                if ((month && month > 12) || (year && year > 24) || (!month && this.expirationDate[1] === '0') || (!year && this.expirationDate[4] === '0')) {
-                    this.expirationDate = null;
+                let reg = /^[0-1][0-9]*$/;
+                let validMonth = !!this.expirationDate.split('/')[0].match(reg);
+                if(!validMonth){
+                    this.expirationDate = "";
+                }
+                if (this.expirationDate && Number(this.expirationDate[3]) > 2 || Number(this.expirationDate[3]) < 1) {
+                    this.expirationDate = this.expirationDate.slice(0, 3)
+                }
+                if ( this.expirationDate && this.expirationDate.length >= 5) {
+                    console.log(Number(this.expirationDate.slice(3)))
+                    if (Number(this.expirationDate.slice(3)) > 24 || Number(this.expirationDate.slice(3)) < 19) {
+                        this.expirationDate = this.expirationDate.slice(0, 4)
+                    }
                 }
                 this.onFlipCard('front');
                 this.onBlurMixin(id);
@@ -268,6 +277,7 @@
         padding: 20px 50px;
 
     }
+
     /* FRONT OF CARD */
     #svgname {
         text-transform: uppercase;
@@ -283,6 +293,7 @@
             margin-top: 10em;
         }
     }
+
     /*cc chip icon*/
     .st2 {
         fill: #FFFFFF;

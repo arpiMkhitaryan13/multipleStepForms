@@ -41,7 +41,7 @@
         },
         data() {
             return {
-                currentStep: 2,
+                currentStep: 3,
                 totalSteps: 4,
                 countries: null,
                 form1Data: null,
@@ -55,14 +55,38 @@
 
         methods: {
             submit() {
+
                 if (this.form3Data && this.form2Data && this.form1Data) {
-                    console.log('succsess:', [this.form3Data, this.form2Data, this.form1Data ]);
+                    const {form1Data, form2Data, form3Data } = this;
+                    console.log('succsess:',
+                        {
+                            name: form1Data.name,
+                            lastName: form1Data.lastName,
+                            country: form1Data.country,
+                            city: form1Data.city,
+                            address: form1Data.address,
+                            postalCode: form1Data.postalCode,
+                            shipping: {
+                                shippingCountry: form1Data.shippingCountry || form1Data.country,
+                                shippingCity: form1Data.shippingCity || form1Data.city,
+                                shippingAddress: form1Data.shippingAddress || form1Data.address,
+                                shippingPostalCode: form1Data.shippingPostalCode || form1Data.postalCode,
+                            },
+                            email: form2Data.email,
+                            password: form2Data.password,
+                            cardNumber: form3Data.cardNumber,
+                            cardHolderName: form3Data.cardHolderName,
+                            securityCode: form3Data.securityCode,
+                            expirationDate: form3Data.expirationDate,
+                        }
+                    );
                 } else {
                     console.log('error');
                 }
             },
             onSubmitStep1(value) {
                 this.form1Data = value;
+                console.log(this.form1Data,'form1 data');
                 this.currentStep = value.step;
             },
             onSubmitStep2(value) {

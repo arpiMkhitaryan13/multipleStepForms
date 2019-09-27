@@ -61,14 +61,16 @@
         </div>
         <div class="inputWrapper">
             <input class="shippingCheckbox"
-                   v-on:change="check"
                    type="checkbox"
-                   name="shipping">
+                   name="shipping"
+                   v-model="checked"
+                   @change="check"
+            >
             <span>Use filled data for shipping</span><br>
         </div>
         <div class="inputWrapper">
             <select v-bind:class="{'invalid':!shippingCountry && attemptSubmit && !checked, 'unused':checked}"
-                    v-model="abracadabra"
+                    v-model="this.checked ? this.country : this.shippingCountry"
                     :disabled="checked">
                 <option value="" disabled hidden>Choose your Country</option>
                 <option v-for="country in countries" v-bind:value="country.Country">
@@ -125,7 +127,6 @@
         data() {
             const {form1Data} = this;
             return {
-                abracadabra: this.checked ? this.country : this.shippingCountry,
                 attemptSubmit: false,
                 checked: form1Data && form1Data.checked || false,
                 name: form1Data && form1Data.name || null,
@@ -143,12 +144,11 @@
 
         methods: {
             check() {
-                this.checked = !this.checked;
+                console.log(this.checked);
             },
             submit() {
                 this.attemptSubmit = true;
                 const {name, lastName, country, city, address, postalCode, checked, shippingCountry, shippingCity, shippingAddress, shippingPostalCode} = this;
-
                 if (this.isFormValid) {
                     const propsToPass = {
                         step: 2,
@@ -166,6 +166,7 @@
                             shippingPostalCode: checked ? postalCode : shippingPostalCode,
                         }
                     };
+                    console.log(propsToPass,'propstopass');
                     this.$emit('onSubmitStep1', propsToPass);
                 } else {
                     console.log('error in step 1');
@@ -213,12 +214,20 @@
                 }
             },
             isFormValid() {
-                const {name, lastName, city, address, country, isPostalCodeValid} = this;
-                if (this.checked) {
+                const {name, lastName, city, address, country, isPostalCodeValid, checked} = this;
+                if (checked) {
+                    console.log(13);
                     return name && lastName && address && !!city && country && isPostalCodeValid;
                 } else {
                     for (let key in this.$data)
-                        if (!this.$data[key]) return false;
+                        if (!this.$data[key]) {
+                            if(key === 'checked'){
+                                continue;
+                            }
+                                if(!this.$data.checked)
+                                console.log(this.$data,'not checked');
+                                return false
+                            }
                     return true;
                 }
             }
@@ -242,8 +251,4 @@
         background-color: rgb(235, 235, 228);
         border-color: unset !important;
     }
-    /*.inputWrapper {*/
-    /*    width: 60%;*/
-    /*    margin: 0 auto;*/
-    /*}*/
 </style>

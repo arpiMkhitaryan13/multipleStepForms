@@ -1,5 +1,5 @@
 <template>
-    <h1>Abracadabra</h1>
+    <h1>See result in console</h1>
 </template>
 
 <script>
